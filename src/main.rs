@@ -9,10 +9,7 @@ struct Options {
     datetime: String,
 }
 
-fn main() -> Result<(), ParseError> {
-    let options = Options::from_args();
-
-    let dt = DateTime::parse_from_rfc2822(&options.datetime.to_string()).unwrap();
+fn humanize(dt: DateTime<FixedOffset>) -> Result<String> {
     let ht = HumanTime::from(dt);
     let str = ht
         .to_text_en(Accuracy::Rough, Tense::Past)
@@ -33,6 +30,16 @@ fn main() -> Result<(), ParseError> {
         .replace(" months", "mo")
         .replace("a year", "1y")
         .replace(" years", "y");
+
+    return str;
+}
+
+fn main() -> Result<(), ParseError> {
+    let options = Options::from_args();
+
+    let dt = DateTime::parse_from_rfc2822(&options.datetime.to_string()).unwrap();
+
+    let str = humanize(dt);
 
     println!("{}", str);
 

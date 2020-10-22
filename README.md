@@ -22,3 +22,7 @@ $ timeago "$(git log -1 --format=%cD)"
 ```
 
 ## Install
+
+```
+cargo install timeago-cli
+```

@@ -26,7 +26,9 @@ fn main() -> Result<(), ParseError> {
         .replace(" weeks", "w")
         .replace("a month", "1mo")
         .replace("a minute", "1m")
-        .replace(" months", "mo");
+        .replace(" months", "mo")
+        .replace("a year", "1y")
+        .replace(" years", "y");
 
     println!("{}", str);
 

@@ -1,5 +1,5 @@
 [package]
-name = "timeago"
+name = "timeago-cli"
 version = "0.1.0"
 authors = ["Jeffrey Jose <jeffjosejeff@gmail.com>"]
 edition = "2018"

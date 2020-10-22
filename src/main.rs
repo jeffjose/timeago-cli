@@ -17,11 +17,15 @@ fn main() -> Result<(), ParseError> {
     let str = ht
         .to_text_en(Accuracy::Rough, Tense::Past)
         .replace(",", "")
+        .replace(" ago", "")
         .replace("and ", "")
         .replace(" days", "d")
         .replace(" hours", "h")
         .replace(" minutes", "m")
-        .replace(" seconds", "s");
+        .replace(" seconds", "s")
+        .replace(" weeks", "w")
+        .replace("a month", "1m")
+        .replace(" months", "m");
 
     println!("{}", str);
 

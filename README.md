@@ -10,19 +10,19 @@ A dead-simple CLI to convert RFC2332 to short humanize strings. Useful for promp
 
 ## Usage
 
-```
+```bash
 $ timeago 'Wed, 21 Oct 2020 00:07:08 -0700'
 ```
 
 Use it with `git log` to get how far back the last commit was
 
-```
+```bash
 $ timeago "$(git log -1 --format=%cD)"
-2m ago
+2m
 ```
 
 ## Install
 
-```
+```bash
 cargo install timeago-cli
 ```

@@ -3,6 +3,11 @@ name = "timeago"
 version = "0.1.0"
 authors = ["Jeffrey Jose <jeffjosejeff@gmail.com>"]
 edition = "2018"
+description = "A dead-simple CLI tool to convert RFC2332 to short humanized strings"
+keywords = ["cli", "timeago", "humanize"]
+categories = ["command-line-utilties"]
+readme = "README.md"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

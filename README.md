@@ -18,7 +18,28 @@ Use it with `git log` to get how far back the last commit was
 
 ```bash
 $ timeago "$(git log -1 --format=%cD)"
-2m
+12h
+```
+
+You can get longer strings with `--long`
+
+```bash
+$ timeago "$(git log -1 --format=%cD)" --long
+12 hours
+```
+
+Or precise timeago strings with `--precise`
+
+```bash
+$ timeago "$(git log -1 --format=%cD)" --precise
+12 hours 30 minutes and 19 seconds
+```
+
+Customize the separator (default ` `) with `--seperator`
+
+```bash
+$ timeago "$(git log -1 --format=%cD)" --precise --separator '|'
+12h|31m|43s
 ```
 
 ## Install

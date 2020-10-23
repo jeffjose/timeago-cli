@@ -1,9 +1,9 @@
 [package]
 name = "timeago-cli"
-version = "0.4.2"
+version = "0.4.3"
 authors = ["Jeffrey Jose <jeffjosejeff@gmail.com>"]
 edition = "2018"
-description = "A dead-simple CLI tool to convert RFC2332 to short humanized strings"
+description = "A dead-simple CLI tool to convert RFC2822 to short humanized strings"
 keywords = ["cli", "timeago", "humanize"]
 categories = ["command-line-utilities"]
 readme = "README.md"

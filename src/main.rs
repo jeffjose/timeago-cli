@@ -46,20 +46,20 @@ fn humanize(dt: DateTime<FixedOffset>, long: bool, precise: bool) -> String {
         .replace("1 hour", "1h")
         .replace(" hours", "h")
         .replace("a minute", "1m")
-        .replace("1 minute", "1m")
         .replace(" minutes", "m")
+        .replace("1 minute", "1m")
         .replace("a second", "1s")
-        .replace("1 second", "1s")
         .replace(" seconds", "s")
+        .replace("1 second", "1s")
         .replace("a week", "1w")
-        .replace("1 week", "1w")
         .replace(" weeks", "w")
+        .replace("1 week", "1w")
         .replace("a month", "1mo")
-        .replace("1 month", "1mo")
         .replace(" months", "mo")
+        .replace("1 month", "1mo")
         .replace("a year", "1y")
-        .replace("1 year", "1y")
-        .replace(" years", "y");
+        .replace(" years", "y")
+        .replace("1 year", "1y");
 }
 
 fn main() -> Result<(), ParseError> {

@@ -3,12 +3,6 @@ use chrono::{DateTime, FixedOffset};
 use chrono_humanize::{Accuracy, HumanTime, Tense};
 use structopt::StructOpt;
 
-#[cfg(test)]
-extern crate speculate;
-
-#[cfg(test)]
-use speculate::speculate;
-
 #[derive(StructOpt, Debug)]
 #[structopt(name = "A simple tool to humanize datetime")]
 struct Options {
@@ -79,7 +73,14 @@ fn main() -> Result<(), ParseError> {
     Ok(())
 }
 
-speculate! {
+#[cfg(test)]
+mod tests {
+
+
+    use test_case::test_case;
+
+    use super::*;
+
 
     use chrono::Duration;
 
@@ -91,37 +92,78 @@ speculate! {
         return dt;
     }
 
-    describe "noflags"{
+    #[test_case(chrono::Duration::seconds(1), "now"; "1 second")]
+    #[test_case(chrono::Duration::seconds(30), "30s"; "30 seconds")]
+    #[test_case(chrono::Duration::minutes(1), "1m"; "1 minute")]
+    #[test_case(chrono::Duration::minutes(30), "30m"; "30 minutes")]
+    #[test_case(chrono::Duration::hours(1), "1h"; "1 hour")]
+    #[test_case(chrono::Duration::hours(10), "10h"; "10 hours")]
+    #[test_case(chrono::Duration::hours(30), "1d"; "1 day")]
+    #[test_case(chrono::Duration::hours(50), "2d"; "2 days")]
+    #[test_case(chrono::Duration::hours(24 * 7), "1w"; "1 week")]
+    #[test_case(chrono::Duration::hours(24 * 7 * 3), "3w"; "3 weeks")]
+    #[test_case(chrono::Duration::hours(24 * 7 * 6), "1mo"; "1 month")]
+    #[test_case(chrono::Duration::hours(24 * 7 * 40), "9mo"; "9 months")]
+    fn short(duration : Duration, expected: &str) {
+        let dt = create_dt(duration);
+        let actual =  humanize(dt, false, false);
 
-        it "can do seconds" {
-            let dt = create_dt(chrono::Duration::seconds(30));
-            assert_eq!(humanize(dt, false, false), "30s");
-
-        }
-
-        it "can do minutes" {
-            let dt = create_dt(chrono::Duration::minutes(10));
-            assert_eq!(humanize(dt, false, false), "10m");
-        }
-
-        it "can do hours" {
-            let dt = create_dt(chrono::Duration::hours(2));
-            assert_eq!(humanize(dt, false, false), "2h");
-        }
+        assert_eq!(expected, actual);
     }
 
+    #[test_case(chrono::Duration::seconds(1), "now"; "1 second")]
+    #[test_case(chrono::Duration::seconds(30), "30 seconds"; "30 seconds")]
+    #[test_case(chrono::Duration::minutes(1), "a minute"; "1 minute")]
+    #[test_case(chrono::Duration::minutes(30), "30 minutes"; "30 minutes")]
+    #[test_case(chrono::Duration::hours(1), "an hour"; "1 hour")]
+    #[test_case(chrono::Duration::hours(10), "10 hours"; "10 hours")]
+    #[test_case(chrono::Duration::hours(30), "a day"; "1 day")]
+    #[test_case(chrono::Duration::hours(50), "2 days"; "2 days")]
+    #[test_case(chrono::Duration::hours(24 * 7), "a week"; "1 week")]
+    #[test_case(chrono::Duration::hours(24 * 7 * 3), "3 weeks"; "3 weeks")]
+    #[test_case(chrono::Duration::hours(24 * 7 * 6), "a month"; "1 month")]
+    #[test_case(chrono::Duration::hours(24 * 7 * 40), "9 months"; "9 months")]
+    fn long(duration : Duration, expected: &str) {
+        let dt = create_dt(duration);
+        let actual =  humanize(dt, true, false);
 
-        //let dt = create_dt(chrono::Duration::seconds(30));
-        //assert_eq!(humanize(dt, true, false), "30 seconds");
+        assert_eq!(expected, actual);
+    }
+    #[test_case(chrono::Duration::seconds(1), "1s"; "1 second")]
+    #[test_case(chrono::Duration::seconds(30), "30s"; "30 seconds")]
+    #[test_case(chrono::Duration::minutes(1), "1m"; "1 minute")]
+    #[test_case(chrono::Duration::minutes(30), "30m"; "30 minutes")]
+    #[test_case(chrono::Duration::hours(1), "1h"; "1 hour")]
+    #[test_case(chrono::Duration::hours(10), "10h"; "10 hours")]
+    #[test_case(chrono::Duration::hours(30), "1d 6h"; "1 day, 6hours")]
+    #[test_case(chrono::Duration::hours(50), "2d 2h"; "2 days, 2hours")]
+    #[test_case(chrono::Duration::hours(24 * 7), "1w"; "1 week")]
+    #[test_case(chrono::Duration::hours(24 * 7 * 3), "3w"; "3 weeks")]
+    #[test_case(chrono::Duration::hours(24 * 7 * 6), "1mo 1w 5d"; "1 month, 1week, 5 day")]
+    #[test_case(chrono::Duration::hours(24 * 7 * 40), "9mo 1w 3d"; "9 months, 1 week, 3 days")]
+    fn short_precise(duration : Duration, expected: &str) {
+        let dt = create_dt(duration);
+        let actual =  humanize(dt, false, true);
 
-        //let dt = create_dt(chrono::Duration::minutes(10));
-        //assert_eq!(humanize(dt, true, false), "10 minutes");
+        assert_eq!(expected, actual);
+    }
 
-        //let dt = create_dt(chrono::Duration::hours(2));
-        //assert_eq!(humanize(dt, true, false), "2 hours");
+    #[test_case(chrono::Duration::seconds(1), "1 second"; "1 second")]
+    #[test_case(chrono::Duration::seconds(30), "30 seconds"; "30 seconds")]
+    #[test_case(chrono::Duration::minutes(1), "1 minute"; "1 minute")]
+    #[test_case(chrono::Duration::minutes(30), "30 minutes"; "30 minutes")]
+    #[test_case(chrono::Duration::hours(1), "1 hour"; "1 hour")]
+    #[test_case(chrono::Duration::hours(10), "10 hours"; "10 hours")]
+    #[test_case(chrono::Duration::hours(30), "1 day and 6 hours"; "1 day, 6hours")]
+    #[test_case(chrono::Duration::hours(50), "2 days and 2 hours"; "2 days, 2hours")]
+    #[test_case(chrono::Duration::hours(24 * 7), "1 week"; "1 week")]
+    #[test_case(chrono::Duration::hours(24 * 7 * 3), "3 weeks"; "3 weeks")]
+    #[test_case(chrono::Duration::hours(24 * 7 * 6), "1 month 1 week and 5 days"; "1 month, 1week, 5 day")]
+    #[test_case(chrono::Duration::hours(24 * 7 * 40), "9 months 1 week and 3 days"; "9 months, 1 week, 3 days")]
+    fn long_precise(duration : Duration, expected: &str) {
+        let dt = create_dt(duration);
+        let actual =  humanize(dt, true, true);
 
-
-
-
-
+        assert_eq!(expected, actual);
+    }
 }

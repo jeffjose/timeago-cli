@@ -21,6 +21,14 @@ $ timeago "$(git log -1 --format=%cD)"
 12h
 ```
 
+## Install
+
+```bash
+cargo install timeago-cli
+```
+
+## Options
+
 You can get longer strings with `--long`
 
 ```bash
@@ -40,10 +48,4 @@ Customize the separator (default ` `) with `--seperator`
 ```bash
 $ timeago "$(git log -1 --format=%cD)" --precise --separator '|'
 12h|31m|43s
-```
-
-## Install
-
-```bash
-cargo install timeago-cli
 ```

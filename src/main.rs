@@ -34,11 +34,10 @@ fn humanize(dt: DateTime<FixedOffset>, long: bool, precise: bool) -> String {
             .replace(" ago", "");
     }
 
-    if long == true {
+    if long {
         return str;
     }
-    return str
-        .replace("and ", "")
+    str.replace("and ", "")
         .replace("a day", "1d")
         .replace("1 day", "1d")
         .replace(" days", "d")
@@ -59,37 +58,35 @@ fn humanize(dt: DateTime<FixedOffset>, long: bool, precise: bool) -> String {
         .replace("1 month", "1mo")
         .replace("a year", "1y")
         .replace(" years", "y")
-        .replace("1 year", "1y");
+        .replace("1 year", "1y")
 }
 
 fn main() -> Result<(), ParseError> {
     let options = Options::from_args();
 
-    let dt = DateTime::parse_from_rfc2822(&options.datetime.to_string()).unwrap();
-
-    let str = humanize(dt, options.long, options.precise);
-    println!("{}", str.replace(" ", &options.separator.to_string()));
-
-    Ok(())
+    match DateTime::parse_from_rfc2822(&options.datetime) {
+        Ok(dt) => {
+            let str = humanize(dt, options.long, options.precise);
+            println!("{}", str.replace(" ", &options.separator));
+            std::process::exit(0);
+        }
+        Err(_) => std::process::exit(1),
+    }
 }
 
 #[cfg(test)]
 mod tests {
 
-
     use test_case::test_case;
 
     use super::*;
-
 
     use chrono::Duration;
 
     fn create_dt(duration: Duration) -> DateTime<FixedOffset> {
         let _dt = chrono::Local::now() - duration;
 
-        let dt = _dt.with_timezone(_dt.offset());
-
-        return dt;
+        _dt.with_timezone(_dt.offset())
     }
 
     #[test_case(chrono::Duration::seconds(1), "now"; "1 second")]
@@ -104,9 +101,9 @@ mod tests {
     #[test_case(chrono::Duration::hours(24 * 7 * 3), "3w"; "3 weeks")]
     #[test_case(chrono::Duration::hours(24 * 7 * 6), "1mo"; "1 month")]
     #[test_case(chrono::Duration::hours(24 * 7 * 40), "9mo"; "9 months")]
-    fn short(duration : Duration, expected: &str) {
+    fn short(duration: Duration, expected: &str) {
         let dt = create_dt(duration);
-        let actual =  humanize(dt, false, false);
+        let actual = humanize(dt, false, false);
 
         assert_eq!(expected, actual);
     }
@@ -123,9 +120,9 @@ mod tests {
     #[test_case(chrono::Duration::hours(24 * 7 * 3), "3 weeks"; "3 weeks")]
     #[test_case(chrono::Duration::hours(24 * 7 * 6), "a month"; "1 month")]
     #[test_case(chrono::Duration::hours(24 * 7 * 40), "9 months"; "9 months")]
-    fn long(duration : Duration, expected: &str) {
+    fn long(duration: Duration, expected: &str) {
         let dt = create_dt(duration);
-        let actual =  humanize(dt, true, false);
+        let actual = humanize(dt, true, false);
 
         assert_eq!(expected, actual);
     }
@@ -141,9 +138,9 @@ mod tests {
     #[test_case(chrono::Duration::hours(24 * 7 * 3), "3w"; "3 weeks")]
     #[test_case(chrono::Duration::hours(24 * 7 * 6), "1mo 1w 5d"; "1 month, 1week, 5 day")]
     #[test_case(chrono::Duration::hours(24 * 7 * 40), "9mo 1w 3d"; "9 months, 1 week, 3 days")]
-    fn short_precise(duration : Duration, expected: &str) {
+    fn short_precise(duration: Duration, expected: &str) {
         let dt = create_dt(duration);
-        let actual =  humanize(dt, false, true);
+        let actual = humanize(dt, false, true);
 
         assert_eq!(expected, actual);
     }
@@ -160,9 +157,9 @@ mod tests {
     #[test_case(chrono::Duration::hours(24 * 7 * 3), "3 weeks"; "3 weeks")]
     #[test_case(chrono::Duration::hours(24 * 7 * 6), "1 month 1 week and 5 days"; "1 month, 1week, 5 day")]
     #[test_case(chrono::Duration::hours(24 * 7 * 40), "9 months 1 week and 3 days"; "9 months, 1 week, 3 days")]
-    fn long_precise(duration : Duration, expected: &str) {
+    fn long_precise(duration: Duration, expected: &str) {
         let dt = create_dt(duration);
-        let actual =  humanize(dt, true, true);
+        let actual = humanize(dt, true, true);
 
         assert_eq!(expected, actual);
     }

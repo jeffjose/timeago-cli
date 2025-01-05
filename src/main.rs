@@ -18,60 +18,71 @@ struct Options {
     separator: String,
 }
 
+const REPLACEMENTS: &[(&str, &str)] = &[
+    ("a day", "1d"),
+    ("1 day", "1d"),
+    (" days", "d"),
+    ("an hour", "1h"),
+    ("1 hour", "1h"),
+    (" hours", "h"),
+    ("a minute", "1m"),
+    (" minutes", "m"),
+    ("1 minute", "1m"),
+    ("a second", "1s"),
+    (" seconds", "s"),
+    ("1 second", "1s"),
+    ("a week", "1w"),
+    (" weeks", "w"),
+    ("1 week", "1w"),
+    ("a month", "1mo"),
+    (" months", "mo"),
+    ("1 month", "1mo"),
+    ("a year", "1y"),
+    (" years", "y"),
+    ("1 year", "1y"),
+];
+
+fn apply_short_format(text: &str) -> String {
+    let mut result = text.to_string();
+    result = result.replace("and ", "");
+
+    for (from, to) in REPLACEMENTS {
+        result = result.replace(from, to);
+    }
+
+    result
+}
+
 fn humanize(dt: DateTime<FixedOffset>, long: bool, precise: bool) -> String {
     let ht = HumanTime::from(dt);
-
-    let str: String;
-    if precise {
-        str = ht
-            .to_text_en(Accuracy::Precise, Tense::Past)
-            .replace(",", "")
-            .replace(" ago", "");
+    let accuracy = if precise {
+        Accuracy::Precise
     } else {
-        str = ht
-            .to_text_en(Accuracy::Rough, Tense::Past)
-            .replace(",", "")
-            .replace(" ago", "");
+        Accuracy::Rough
+    };
+
+    let mut text = ht.to_text_en(accuracy, Tense::Past);
+
+    // Remove common suffixes first
+    text = text.replace(",", "").replace(" ago", "");
+
+    if !long {
+        text = apply_short_format(&text);
     }
 
-    if long {
-        return str;
-    }
-    str.replace("and ", "")
-        .replace("a day", "1d")
-        .replace("1 day", "1d")
-        .replace(" days", "d")
-        .replace("an hour", "1h")
-        .replace("1 hour", "1h")
-        .replace(" hours", "h")
-        .replace("a minute", "1m")
-        .replace(" minutes", "m")
-        .replace("1 minute", "1m")
-        .replace("a second", "1s")
-        .replace(" seconds", "s")
-        .replace("1 second", "1s")
-        .replace("a week", "1w")
-        .replace(" weeks", "w")
-        .replace("1 week", "1w")
-        .replace("a month", "1mo")
-        .replace(" months", "mo")
-        .replace("1 month", "1mo")
-        .replace("a year", "1y")
-        .replace(" years", "y")
-        .replace("1 year", "1y")
+    text
 }
 
 fn main() -> Result<(), ParseError> {
     let options = Options::from_args();
 
-    match DateTime::parse_from_rfc2822(&options.datetime) {
-        Ok(dt) => {
+    DateTime::parse_from_rfc2822(&options.datetime)
+        .map(|dt| {
             let str = humanize(dt, options.long, options.precise);
             println!("{}", str.replace(" ", &options.separator));
             std::process::exit(0);
-        }
-        Err(_) => std::process::exit(1),
-    }
+        })
+        .unwrap_or_else(|_| std::process::exit(1))
 }
 
 #[cfg(test)]
